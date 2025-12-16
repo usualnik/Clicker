@@ -7,6 +7,9 @@ public class ShopItemsManager : MonoBehaviour
 
     public event Action<ShopItem> OnShopItemBought;
     public event Action<ShopItem> OnNewItemSpawnedInShop;
+    public ShopItem CurrentItem => _currentItem;
+
+    [SerializeField] private ShopItem _currentItem;
 
     [SerializeField] private ShopItem[] _allItemsInShop;
 
@@ -55,7 +58,9 @@ public class ShopItemsManager : MonoBehaviour
 
     public void PlayerBuyItem(ShopItem shopItem)
     {
+        AudioManager.Instance.Play("Buy");
         OnShopItemBought?.Invoke(shopItem);
+        _currentItem = shopItem;
     }
 
     private void TryOpenNewItem(int playerMoneyAmount)
@@ -70,6 +75,11 @@ public class ShopItemsManager : MonoBehaviour
 
             }
         }
+    }
+
+    public void SetCurrentItem(ShopItem shopItem)
+    {
+        _currentItem = shopItem;
     }
 
 }

@@ -68,9 +68,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: a6250a3f6f67c2a4cad858283311db58, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b671975cb320e454aa25525f1716757a, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -90,10 +90,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60402bdec52162c49a5465a369270053, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _clicksNeeded: 
+  _replicsRU: []
+  _replicsEN: []
   _shopItemName: 
   _itemIndex: 0
   _itemPrice: 0
   _itemIncomeIncrese: 0
+  _itemClickAudioClipName: 
+  _isCanBeBought: 1
 --- !u!1 &3769237756633318115
 GameObject:
   m_ObjectHideFlags: 0
@@ -159,7 +164,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: b671975cb320e454aa25525f1716757a, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

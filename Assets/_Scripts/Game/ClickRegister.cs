@@ -94,6 +94,21 @@ public class ClickRegister : MonoBehaviour, IPointerClickHandler
 
         // Запускаем анимацию
         _clickSequence.Play();
+
+
+        // Проигрываем звук либо предмета, либо дефолтный button
+        string clickSoundName = string.Empty;
+
+        if (ShopItemsManager.Instance.CurrentItem)
+        {
+            clickSoundName = ShopItemsManager.Instance.CurrentItem.ItemClickAudioClipName;
+        }
+        else
+        {
+            clickSoundName = "Button";
+        }
+
+        AudioManager.Instance.Play(clickSoundName);
     }
 
     private void OnDestroy()
