@@ -1,21 +1,20 @@
+using System;
 using UnityEngine;
 using YG;
 
 public class Narrator : MonoBehaviour
 {
     public static Narrator Instance { get; private set; }
-
-    [Header("Props")]
-    [SerializeField] private int _clicks;
-    [SerializeField] private int[] _clicksNeededToPrintMessage;
-    [SerializeField] private int _currentReplicaIndex = 0;
-
-
+    public event Action<string> OnReplicaPrinted; 
 
     [Header("System Refs")]
     [SerializeField] private GameObject _beginig;
     [SerializeField] private GameObject _gamePlayText;
     [SerializeField] private GameObject _ending;
+
+    private int _clicks;
+    private int[] _clicksNeededToPrintMessage;
+    private int _currentReplicaIndex = 0;
 
     private bool _isBeginingShouldStart = true;
 
@@ -33,17 +32,24 @@ public class Narrator : MonoBehaviour
     private void Start()
     {
         InitBegining();
+        LoadClicksAmount();
         ReConfigureNarrativeData(ShopItemsManager.Instance.CurrentItem);
 
         ShopItemsManager.Instance.OnShopItemBought += ShopItemsManager_OnShopItemBought;
         ClickRegister.Instance.OnClick += ClickRegister_OnClick;
+        GameManager.Instance.OnWinGame += GameManager_OnWinGame;
 
     }
+
+
     private void OnDestroy()
     {
         ClickRegister.Instance.OnClick -= ClickRegister_OnClick;
         ShopItemsManager.Instance.OnShopItemBought -= ShopItemsManager_OnShopItemBought;
-
+    }
+    private void LoadClicksAmount()
+    {
+        _clicks = PlayerData.Instance.GetCurrentClicksAmount();
     }
 
     private void ShopItemsManager_OnShopItemBought(ShopItem obj)
@@ -54,10 +60,16 @@ public class Narrator : MonoBehaviour
     {
         OnClick();
     }
+    private void GameManager_OnWinGame()
+    {
+        InitEnding();
+    }
 
     private void InitBegining()
     {
-        _beginig.SetActive(_isBeginingShouldStart);
+        _beginig.SetActive(PlayerData.Instance.GetIsFirstTimePlaying());
+
+        PlayerData.Instance.ChangeFisrtTimePlaying(false);
     }
     private void InitEnding()
     {
@@ -72,6 +84,8 @@ public class Narrator : MonoBehaviour
     private void OnClick()
     {
         _clicks += 1;
+
+        PlayerData.Instance.SetCurrentClicks(_clicks);
      
         if (_currentReplicaIndex >= _clicksNeededToPrintMessage.Length)
         {
@@ -95,6 +109,8 @@ public class Narrator : MonoBehaviour
             : ShopItemsManager.Instance.CurrentItem.ReplicsEN[_currentReplicaIndex];
 
         _gamePlayText.GetComponent<GameplayText>().PrintReplica(replicaToPrint);
+
+        OnReplicaPrinted?.Invoke(replicaToPrint);
 
     }
 }

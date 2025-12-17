@@ -11,12 +11,15 @@ public class Ending : MonoBehaviour
 
     [Header("EndingBackgrounds")]
     [SerializeField] private Sprite[] _endingBackgrounds;
+
+    [Header("System refs")]
+    [SerializeField] private UI_RestartButton _restartButton;
+
+
     private int _endingBackgroundIndex = 0;
     private Image _background;
-    
 
     private string[] _endingReplicsRU;
-
     private string[] _endingReplicsEN;
 
     private TextMeshProUGUI _textBox;
@@ -25,7 +28,9 @@ public class Ending : MonoBehaviour
     private int _currentReplicaIndex;
     private bool _isTyping;
     private string[] _currentReplics;
+
     
+
 
     private void Awake()
     {
@@ -38,13 +43,15 @@ public class Ending : MonoBehaviour
         InitText();
         InitBackground();
 
+        AudioManager.Instance.Play(ShopItemsManager.Instance.CurrentItem.ItemClickAudioClipName);
+
         _currentReplicaIndex = 0;
         ShowReplica();
     }
 
     private void InitBackground()
-    {          
-        _background.sprite = _endingBackgrounds[0];        
+    {
+        _background.sprite = _endingBackgrounds[0];
     }
     private void InitText()
     {
@@ -112,23 +119,37 @@ public class Ending : MonoBehaviour
 
         if (_endingBackgrounds.Length > 1)
         {
-            ChangeBackgrounds();
+            BadEndingChangeBackgrounds();
         }
 
         if (_currentReplicaIndex >= _currentReplics.Length)
         {
-            gameObject.SetActive(false);
+            _restartButton.gameObject.SetActive(true);
             return;
         }
 
         ShowReplica();
     }
 
-    private void ChangeBackgrounds()
+    private void BadEndingChangeBackgrounds()
     {
-        _endingBackgroundIndex++;
-        _background.sprite = _endingBackgrounds[_endingBackgroundIndex];
+
+        switch (_currentReplicaIndex)
+        {
+            case 0:
+                _background.sprite = _endingBackgrounds[0];
+                break;
+            case 2:
+                _background.sprite = _endingBackgrounds[1];
+                break;
+            case 5:
+                _background.sprite = _endingBackgrounds[2];
+                break;
+            case 7:
+                _background.sprite = _endingBackgrounds[3];
+                break;
+        }
     }
 
-   
+
 }

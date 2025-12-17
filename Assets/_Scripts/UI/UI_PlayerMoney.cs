@@ -13,12 +13,19 @@ public class UI_PlayerMoney : MonoBehaviour
     private void Start()
     {
         GameManager.Instance.OnPlayerMoneyChanged += GameManager_OnPlayerMoneyChanged;
+        InitPlayerMoney();
     }
     private void OnDestroy()
     {
         GameManager.Instance.OnPlayerMoneyChanged -= GameManager_OnPlayerMoneyChanged;
 
     }
+
+    private void InitPlayerMoney()
+    {
+        _moneyText.text = PlayerData.Instance.GetCurrentMoneyAmount().ToString();
+    }
+
     private void GameManager_OnPlayerMoneyChanged(int newPlayerMoneyValue)
     {
         _moneyText.text = newPlayerMoneyValue.ToString();

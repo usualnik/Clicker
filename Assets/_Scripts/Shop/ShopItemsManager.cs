@@ -1,21 +1,24 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ShopItemsManager : MonoBehaviour
 {
-    public static ShopItemsManager Instance {  get; private set; }
+    public static ShopItemsManager Instance { get; private set; }
+    public ShopItem[] AllItemsInShop => _allItemsInShop;
 
     public event Action<ShopItem> OnShopItemBought;
     public event Action<ShopItem> OnNewItemSpawnedInShop;
     public ShopItem CurrentItem => _currentItem;
 
     [SerializeField] private ShopItem _currentItem;
-
     [SerializeField] private ShopItem[] _allItemsInShop;
 
     [SerializeField]
     private int _currentItemsAvailableInShop = 1;
+    private int _currentItemIndex = 0;
 
+    private HashSet<int> _openedItems = new HashSet<int>();
 
     private void Awake()
     {
@@ -33,14 +36,16 @@ public class ShopItemsManager : MonoBehaviour
     private void Start()
     {
         GameManager.Instance.OnPlayerMoneyChanged += GameManager_OnPlayerMoneyChanged;
-
-        InitAvailableItems();
+        LoadItemsAvailable();
+        LoadCurrentItem();
     }
 
     private void OnDestroy()
     {
-        GameManager.Instance.OnPlayerMoneyChanged -= GameManager_OnPlayerMoneyChanged;
-
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnPlayerMoneyChanged -= GameManager_OnPlayerMoneyChanged;
+        }
     }
 
     private void GameManager_OnPlayerMoneyChanged(int obj)
@@ -48,11 +53,47 @@ public class ShopItemsManager : MonoBehaviour
         TryOpenNewItem(obj);
     }
 
+    private void LoadCurrentItem()
+    {
+        _currentItem = _allItemsInShop[PlayerData.Instance.GetCurrentItemIndex()];
+    }
+    private void LoadItemsAvailable()
+    {
+        _currentItemsAvailableInShop = PlayerData.Instance.GetItemsAvailableInShop();
+        _currentItemIndex = PlayerData.Instance.GetCurrentItemIndex();
+
+        foreach (var item in _allItemsInShop)
+        {
+            if (PlayerData.Instance.GetItemsBought().Contains(item.ItemIndex))
+            {
+                item.SetCanBeBought(false);
+            }
+            else
+            {
+                item.SetCanBeBought(true);   
+            }
+        }
+
+        InitAvailableItems();
+    }
+
     private void InitAvailableItems()
     {
         for (int i = 0; i < _currentItemsAvailableInShop; i++)
         {
-            _allItemsInShop[i].gameObject.SetActive(true);
+            if (i < _allItemsInShop.Length)
+            {
+                _allItemsInShop[i].gameObject.SetActive(true);
+                _openedItems.Add(_allItemsInShop[i].ItemIndex);
+            }
+        }
+
+        foreach (var item in _allItemsInShop)
+        {
+            if (PlayerData.Instance.GetItemsBought().Contains(item.ItemIndex))
+            {
+                item.SetCanBeBought(false);
+            }
         }
     }
 
@@ -61,16 +102,27 @@ public class ShopItemsManager : MonoBehaviour
         AudioManager.Instance.Play("Buy");
         OnShopItemBought?.Invoke(shopItem);
         _currentItem = shopItem;
+        _currentItemIndex = _currentItem.ItemIndex;
+
+        PlayerData.Instance.SetNewCurrentItemIndex(_currentItemIndex);
+        PlayerData.Instance.AddNewItemToBoughtList(_currentItem.ItemIndex);
     }
 
     private void TryOpenNewItem(int playerMoneyAmount)
     {
         foreach (var item in _allItemsInShop)
         {
-            if (item.IsCanBeBought && playerMoneyAmount >= item.ItemPrice)
+            if (!_openedItems.Contains(item.ItemIndex) &&
+                item.IsCanBeBought &&
+                playerMoneyAmount >= item.ItemPrice)
             {
                 item.gameObject.SetActive(true);
                 _currentItemsAvailableInShop++;
+
+                _openedItems.Add(item.ItemIndex);
+
+                PlayerData.Instance.SetItemsAvailableInShop(_currentItemsAvailableInShop);
+
                 OnNewItemSpawnedInShop?.Invoke(item);
 
             }
@@ -81,5 +133,4 @@ public class ShopItemsManager : MonoBehaviour
     {
         _currentItem = shopItem;
     }
-
 }

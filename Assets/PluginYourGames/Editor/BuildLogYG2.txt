@@ -1,3 +1,3 @@
 ﻿Build path: D:/Projects/Clicker/Build
-Build number: 0
+Build number: 1
 PluginYG version: 2.007

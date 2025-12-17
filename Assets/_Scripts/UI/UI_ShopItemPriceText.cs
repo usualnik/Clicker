@@ -17,11 +17,19 @@ public class UI_ShopItemPriceText : MonoBehaviour
     private void Start()
     {
         ShopItemsManager.Instance.OnShopItemBought += ShopItemsManager_OnShopItemBought;
+        LoadCanBeBought();
     }
     private void OnDestroy()
     {
         ShopItemsManager.Instance.OnShopItemBought -= ShopItemsManager_OnShopItemBought;
 
+    }
+    private void LoadCanBeBought()
+    {
+        if (!_shopItem.IsCanBeBought)
+        {
+            DeactivateText();
+        }
     }
 
     private void ShopItemsManager_OnShopItemBought(ShopItem obj)
