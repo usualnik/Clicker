@@ -11,6 +11,9 @@ public class Ending : MonoBehaviour
 
     [Header("EndingBackgrounds")]
     [SerializeField] private Sprite[] _endingBackgrounds;
+    [SerializeField] private GameObject _localizationText;    
+    [SerializeField] private GameObject _localizationTextWithCar;
+
 
     [Header("System refs")]
     [SerializeField] private UI_RestartButton _restartButton;
@@ -52,7 +55,24 @@ public class Ending : MonoBehaviour
     private void InitBackground()
     {
         _background.sprite = _endingBackgrounds[0];
+
+       HandleLocaliztionText();
     }
+
+    private void HandleLocaliztionText()
+    {
+        if (ShopItemsManager.Instance.CurrentItem.ItemIndex == 1
+           || ShopItemsManager.Instance.CurrentItem.ItemIndex == 2)
+        {
+            _localizationText.gameObject.SetActive(true);
+        }
+
+        if (ShopItemsManager.Instance.CurrentItem.ItemIndex == 3)
+        {
+            _localizationTextWithCar.SetActive(true);
+        }
+    }
+
     private void InitText()
     {
         _endingReplicsRU = ShopItemsManager.Instance.CurrentItem.EndingReplicsRU;

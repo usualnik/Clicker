@@ -7,11 +7,12 @@ public class GameManager : MonoBehaviour
     public event Action<int> OnPlayerMoneyChanged;
     public event Action<int> OnPlayerIncomeChanged;
     public event Action OnWinGame;
-    public int PlayerMoneyAmount { get; private set; } = 0;
+    public int PlayerMoneyAmount => _playerMoneyAmount;
+
+    [SerializeField] private int _playerMoneyAmount;
 
     private int _playerIncome = 1;
-    //private const int MONEY_AMOUNT_TO_WIN_GAME = 30000;
-    private const int MONEY_AMOUNT_TO_WIN_GAME = 300;
+    private const int MONEY_AMOUNT_TO_WIN_GAME = 30000;
 
     private void Awake()
     {
@@ -42,7 +43,7 @@ public class GameManager : MonoBehaviour
 
     private void LoadMoneyAmount()
     {
-        PlayerMoneyAmount = PlayerData.Instance.GetCurrentMoneyAmount();       
+        _playerMoneyAmount = PlayerData.Instance.GetCurrentMoneyAmount();       
         _playerIncome = ShopItemsManager.Instance.AllItemsInShop[PlayerData.Instance.GetCurrentItemIndex()].ItemIncomeIncrease;
     }
 
@@ -65,12 +66,12 @@ public class GameManager : MonoBehaviour
 
     private void IncreasePlayerMoneyOnClick()
     {
-        PlayerMoneyAmount += _playerIncome;
-        OnPlayerMoneyChanged?.Invoke(PlayerMoneyAmount);
+        _playerMoneyAmount += _playerIncome;
+        OnPlayerMoneyChanged?.Invoke(_playerMoneyAmount);
 
-        PlayerData.Instance.SetCurrentMoney(PlayerMoneyAmount);
+        PlayerData.Instance.SetCurrentMoney(_playerMoneyAmount);
 
-        if (PlayerMoneyAmount >= MONEY_AMOUNT_TO_WIN_GAME)
+        if (_playerMoneyAmount >= MONEY_AMOUNT_TO_WIN_GAME)
         {
             OnWinGame?.Invoke();
         }
@@ -80,11 +81,11 @@ public class GameManager : MonoBehaviour
 
     private void SpendPlayerMoney(int value)
     {
-        if (PlayerMoneyAmount - value >= 0)
+        if (_playerMoneyAmount - value >= 0)
         {
-            PlayerMoneyAmount -= value;
-            OnPlayerMoneyChanged?.Invoke(PlayerMoneyAmount);
-            PlayerData.Instance.SetCurrentMoney(PlayerMoneyAmount);
+            _playerMoneyAmount -= value;
+            OnPlayerMoneyChanged?.Invoke(_playerMoneyAmount);
+            PlayerData.Instance.SetCurrentMoney(_playerMoneyAmount);
         }
     }
 

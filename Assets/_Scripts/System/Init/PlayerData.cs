@@ -7,7 +7,7 @@ public class Data
 {
     public int Money = 0;
     public int Clicks = 0;
-    public int ItemsAvailableInShop = 1;
+    public int ItemsAvailableInShop = 2;
     public int CurrentItemIndex = 0;
     public List<int> itemsBought = new List<int>();
     public bool IsFirstTimePlaying = true;
@@ -68,7 +68,7 @@ public class PlayerData : MonoBehaviour
     {
         data.Money = 0;
         data.Clicks = 0;
-        data.ItemsAvailableInShop = 1;
+        data.ItemsAvailableInShop = 2;
         data.CurrentItemIndex = 0;
         data.itemsBought.Clear();
         data.IsFirstTimePlaying = true;

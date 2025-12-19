@@ -11,6 +11,7 @@ public class Beggining : MonoBehaviour
 
     [Header("BeginingBackgrounds")]
     [SerializeField] private Sprite _bg;
+    [SerializeField] private GameObject _beginigText;
     private Image _background;
 
     private const int SHOULD_CHANGE_BG = 3;
@@ -132,5 +133,6 @@ public class Beggining : MonoBehaviour
     private void ChangeBackground()
     {
         _background.sprite = _bg;
+        _beginigText.gameObject.SetActive(true);
     }
 }

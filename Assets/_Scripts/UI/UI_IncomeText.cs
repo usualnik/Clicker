@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using YG;
 
 public class UI_IncomeText : MonoBehaviour
 {
@@ -26,12 +27,12 @@ public class UI_IncomeText : MonoBehaviour
         int incomeValue = ShopItemsManager.Instance.AllItemsInShop[PlayerData.Instance.GetCurrentItemIndex()]
             .ItemIncomeIncrease;
 
-        _incomeText.text = string.Format($"1 click = {incomeValue} dollars");
-
-
+        _incomeText.text = YG2.envir.language == "ru" ? string.Format($"1 клик = {incomeValue} долларов")
+        : string.Format($"1 click = {incomeValue} dollars");
     }
     private void GameManager_OnPlayerIncomeChanged(int newIncomeValue)
     {
-        _incomeText.text = string.Format($"1 click = {newIncomeValue} dollars");
+        _incomeText.text = YG2.envir.language == "ru" ? string.Format($"1 клик = {newIncomeValue} долларов")
+        : string.Format($"1 click = {newIncomeValue} dollars");
     }
 }

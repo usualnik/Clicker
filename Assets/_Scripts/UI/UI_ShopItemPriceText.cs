@@ -11,7 +11,7 @@ public class UI_ShopItemPriceText : MonoBehaviour
         _priceText = GetComponent<TextMeshProUGUI>();
         _shopItem = GetComponentInParent<ShopItem>();
 
-        _priceText.text = _shopItem.ItemPrice.ToString();
+        _priceText.text = _shopItem.ItemPrice.ToString() + "$";
     }
 
     private void Start()

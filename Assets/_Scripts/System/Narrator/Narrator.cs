@@ -6,11 +6,24 @@ public class Narrator : MonoBehaviour
 {
     public static Narrator Instance { get; private set; }
     public event Action<string> OnReplicaPrinted; 
+    public event Action OnSoapPreEndingStarted;
 
     [Header("System Refs")]
     [SerializeField] private GameObject _beginig;
     [SerializeField] private GameObject _gamePlayText;
     [SerializeField] private GameObject _ending;
+
+    [Header("Special case")]
+    [SerializeField] private GameObject _soapPreEndingBackground;
+    [SerializeField] private GameObject _soapPreEndingCharacterImage;
+    [SerializeField] private GameObject _shopButton;
+    [SerializeField] private GameObject _characterImage;
+    [SerializeField] private AudioClip _soapPreEndingMusic;
+
+
+    [SerializeField] private int _clicksNeededToInitSoapPreending;
+    [SerializeField] private int _soapItemIndex;
+
 
     private int _clicks;
     private int[] _clicksNeededToPrintMessage;
@@ -92,13 +105,21 @@ public class Narrator : MonoBehaviour
             return;
         }
 
-
         if (_clicks >= _clicksNeededToPrintMessage[_currentReplicaIndex])
         {
             PrintReplica();
             _currentReplicaIndex++;
 
         }
+
+
+
+        if (ShopItemsManager.Instance.CurrentItem.ItemIndex == 
+            _soapItemIndex && _clicks == _clicksNeededToInitSoapPreending)
+        {
+            HandleSoapPreEning();
+        }
+
     }
     private void PrintReplica()
     {
@@ -113,4 +134,16 @@ public class Narrator : MonoBehaviour
         OnReplicaPrinted?.Invoke(replicaToPrint);
 
     }
+
+    private void HandleSoapPreEning()
+    {
+        BackgroundMusic.Instance.SetBackgroundMusic(_soapPreEndingMusic);
+        _characterImage.gameObject.SetActive(false);
+        _shopButton.gameObject.SetActive(false);
+        _soapPreEndingCharacterImage.gameObject.SetActive(true);
+        _soapPreEndingBackground.gameObject.SetActive(true);
+
+        OnSoapPreEndingStarted?.Invoke();
+    }
+
 }

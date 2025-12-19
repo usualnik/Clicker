@@ -15,7 +15,7 @@ public class ShopItemsManager : MonoBehaviour
     [SerializeField] private ShopItem[] _allItemsInShop;
 
     [SerializeField]
-    private int _currentItemsAvailableInShop = 1;
+    private int _currentItemsAvailableInShop = 2;
     private int _currentItemIndex = 0;
 
     private HashSet<int> _openedItems = new HashSet<int>();
@@ -50,13 +50,19 @@ public class ShopItemsManager : MonoBehaviour
 
     private void GameManager_OnPlayerMoneyChanged(int obj)
     {
-        TryOpenNewItem(obj);
+        //TryOpenNewItem(obj);
     }
 
     private void LoadCurrentItem()
     {
         _currentItem = _allItemsInShop[PlayerData.Instance.GetCurrentItemIndex()];
+
+        if (_currentItem)
+        {
+            _currentItem.SetSellectedColor();
+        }
     }
+
     private void LoadItemsAvailable()
     {
         _currentItemsAvailableInShop = PlayerData.Instance.GetItemsAvailableInShop();
@@ -70,7 +76,7 @@ public class ShopItemsManager : MonoBehaviour
             }
             else
             {
-                item.SetCanBeBought(true);   
+                item.SetCanBeBought(true);
             }
         }
 
@@ -101,11 +107,31 @@ public class ShopItemsManager : MonoBehaviour
     {
         AudioManager.Instance.Play("Buy");
         OnShopItemBought?.Invoke(shopItem);
+
         _currentItem = shopItem;
         _currentItemIndex = _currentItem.ItemIndex;
 
+        HandleItemsColor();
+
+        // Set color to green 
+        _currentItem.SetSellectedColor();
+
+
+        OpenNextItemInShop();
+
         PlayerData.Instance.SetNewCurrentItemIndex(_currentItemIndex);
         PlayerData.Instance.AddNewItemToBoughtList(_currentItem.ItemIndex);
+    }
+
+    private void HandleItemsColor()
+    {
+        foreach(var item in _allItemsInShop)
+        {
+            if (item.isActiveAndEnabled)
+            {
+                item.SetDeSelectedColor();
+            }
+        }
     }
 
     private void TryOpenNewItem(int playerMoneyAmount)
@@ -116,15 +142,15 @@ public class ShopItemsManager : MonoBehaviour
                 item.IsCanBeBought &&
                 playerMoneyAmount >= item.ItemPrice)
             {
+                // Активируем предмет сразу при открытии
                 item.gameObject.SetActive(true);
                 _currentItemsAvailableInShop++;
-
                 _openedItems.Add(item.ItemIndex);
-
                 PlayerData.Instance.SetItemsAvailableInShop(_currentItemsAvailableInShop);
-
                 OnNewItemSpawnedInShop?.Invoke(item);
 
+                // Открываем следующий предмет сразу же
+                OpenNextAvailableItem();
             }
         }
     }
@@ -132,5 +158,64 @@ public class ShopItemsManager : MonoBehaviour
     public void SetCurrentItem(ShopItem shopItem)
     {
         _currentItem = shopItem;
+    }
+
+    private void OpenNextItemInShop()
+    {
+        // Проверяем, есть ли следующий предмет
+        if (_currentItem.ItemIndex + 1 < _allItemsInShop.Length)
+        {
+            int nextItemIndex = _currentItem.ItemIndex + 1;
+
+            if (!_openedItems.Contains(nextItemIndex))
+            {
+                // Активируем следующий предмет
+                _allItemsInShop[nextItemIndex].gameObject.SetActive(true);
+                _currentItemsAvailableInShop++;
+                _openedItems.Add(nextItemIndex);
+                PlayerData.Instance.SetItemsAvailableInShop(_currentItemsAvailableInShop);
+                OnNewItemSpawnedInShop?.Invoke(_allItemsInShop[nextItemIndex]);
+
+                // Можем продолжить открывать следующие предметы, если нужно
+                // OpenNextAvailableItem();
+            }
+        }
+    }
+
+    private void OpenNextAvailableItem()
+    {
+        for (int i = 0; i < _allItemsInShop.Length; i++)
+        {
+            if (!_openedItems.Contains(_allItemsInShop[i].ItemIndex) &&
+                _allItemsInShop[i].IsCanBeBought)
+            {
+                _allItemsInShop[i].gameObject.SetActive(true);
+                _currentItemsAvailableInShop++;
+                _openedItems.Add(_allItemsInShop[i].ItemIndex);
+                PlayerData.Instance.SetItemsAvailableInShop(_currentItemsAvailableInShop);
+                OnNewItemSpawnedInShop?.Invoke(_allItemsInShop[i]);
+                break;
+            }
+        }
+    }
+
+    public void OpenMultipleItems(int count)
+    {
+        int openedCount = 0;
+
+        for (int i = 0; i < _allItemsInShop.Length && openedCount < count; i++)
+        {
+            if (!_openedItems.Contains(_allItemsInShop[i].ItemIndex))
+            {
+                _allItemsInShop[i].gameObject.SetActive(true);
+                _openedItems.Add(_allItemsInShop[i].ItemIndex);
+                openedCount++;
+
+                OnNewItemSpawnedInShop?.Invoke(_allItemsInShop[i]);
+            }
+        }
+
+        _currentItemsAvailableInShop += openedCount;
+        PlayerData.Instance.SetItemsAvailableInShop(_currentItemsAvailableInShop);
     }
 }

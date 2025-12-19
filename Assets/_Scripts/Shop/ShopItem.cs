@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class ShopItem : MonoBehaviour, IPointerClickHandler
 {
@@ -36,17 +37,20 @@ public class ShopItem : MonoBehaviour, IPointerClickHandler
 
     [SerializeField] private bool _isCanBeBought = true;
 
+    private Image _image;
+
+    private void Awake()
+    {
+        _image = GetComponent<Image>();
+    }
+
     public void OnPointerClick(PointerEventData eventData)
     {
         if (_isCanBeBought)
         {
             TryBuyItem();
         }
-        // Больше свапать предметы нельзя
-        //else
-        //{
-        //    ShopItemsManager.Instance.SetCurrentItem(this);
-        //}
+     
     }
 
     private void TryBuyItem()
@@ -67,4 +71,15 @@ public class ShopItem : MonoBehaviour, IPointerClickHandler
     {
         _isCanBeBought = isCanBeBought;
     }
+    
+    public void SetSellectedColor()
+    {
+        _image.color = Color.green;
+    }
+
+    public void SetDeSelectedColor()
+    {
+        _image.color = Color.white;
+    }
+
 }

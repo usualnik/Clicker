@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class GameplayText : MonoBehaviour
 {
+    public bool IsTyping => _isTyping;
+
     [SerializeField] private float _letterDelay;
     [SerializeField] private float _hideTextBoxDelay = 2.0f;
 
@@ -81,7 +83,6 @@ public class GameplayText : MonoBehaviour
         if (_isTyping)
         {
             Invoke(nameof(FinishTyping), _hideTextBoxDelay);
-
         }
         else
         {
@@ -89,7 +90,7 @@ public class GameplayText : MonoBehaviour
             _typingRoutine = null;
             gameObject.SetActive(false);
         }
-        
+
     }
 
 }

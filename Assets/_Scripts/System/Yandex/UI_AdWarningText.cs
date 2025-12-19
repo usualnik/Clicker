@@ -4,6 +4,8 @@ using YG;
 
 public class UI_AdWarningText : MonoBehaviour
 {
+    public bool IsTimerRunning => _isTimerRunnnig;
+
     private TextMeshProUGUI _adWarningtext;
     private const float AD_WARNING_TIMER_MAX = 3f;
     private float _adWarningTimer;
@@ -11,7 +13,8 @@ public class UI_AdWarningText : MonoBehaviour
     private bool _isTimerRunnnig = false;
 
     private void Awake()
-    {
+    {      
+
         _adWarningtext = GetComponentInChildren<TextMeshProUGUI>();
         _adWarningTimer = AD_WARNING_TIMER_MAX;
     }

@@ -6,7 +6,7 @@ public class UI_CharacterEmotionsChanges : MonoBehaviour
     [SerializeField] private Sprite[] _emotions;
     private Image _characterImage;
     private int _clicksUntillReset;
-    private const int CLICKS_UNTIL_RESET_MAX = 5;
+    private const int CLICKS_UNTIL_RESET_MAX = 20;
     private bool _shouldReset = false;
 
     private void Awake()
@@ -45,7 +45,6 @@ public class UI_CharacterEmotionsChanges : MonoBehaviour
         }
     }
 
-
     private void Instance_OnReplicaPrinted(string replica)
     {
         CheckShouldChaneEmotion(replica);
@@ -56,9 +55,13 @@ public class UI_CharacterEmotionsChanges : MonoBehaviour
         {
             case "Да у тебя талант!":
                 _characterImage.sprite = _emotions[4];
+                _shouldReset = true;
+                _clicksUntillReset = CLICKS_UNTIL_RESET_MAX;
                 break;
             case "You've got talent!":
                 _characterImage.sprite = _emotions[4];
+                _shouldReset = true;
+                _clicksUntillReset = CLICKS_UNTIL_RESET_MAX;
                 break;
             case "А посмотри-ка ты наверх, слева. Можешь купить что-нибудь.":
                 _characterImage.sprite = _emotions[1];
@@ -158,8 +161,7 @@ public class UI_CharacterEmotionsChanges : MonoBehaviour
                 break;
         }
 
-        _shouldReset = true;
-        _clicksUntillReset = CLICKS_UNTIL_RESET_MAX;
+        
 
     }
 }

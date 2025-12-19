@@ -1,14 +1,18 @@
 using DG.Tweening;
 using System;
+using System.Resources;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using YG;
 
 public class ClickRegister : MonoBehaviour, IPointerClickHandler
 {
     public static ClickRegister Instance { get; private set; }
     public event Action OnClick;
 
+    [SerializeField] private Image _characterSoapPreEndingImage;
     [SerializeField] private Image _characterImage;
     [SerializeField] private ParticleSystem _clickParticles;
 
@@ -21,9 +25,27 @@ public class ClickRegister : MonoBehaviour, IPointerClickHandler
     [SerializeField] private int _shakeVibrato = 10;
     [SerializeField] private float _shakeDuration = 0.3f;
 
+    [Header("Animation Special Case Settings")]
+    [SerializeField] private float _clickScaleSoapPreEnding = 1.1f;
+    [SerializeField] private float _clickDurationSoapPreEnding = 0f;
+
+
+
+
+    [Header("Mobile Settings")]
+    [SerializeField] private float _mobileClickCooldown = 0.2f;
+    [SerializeField] private bool _enableMobileCooldown = true;
+
+    [Header("System")]
+    [SerializeField] private UI_AdWarningText _adWarningText;
+    [SerializeField] private GameplayText _gameplayText;
+
+
     private Vector3 _originalScale;
     private Color _originalColor;
-    private Sequence _clickSequence;
+    private DG.Tweening.Sequence _clickSequence;
+    private bool _isOnCooldown = false;
+    private bool _isMobilePlatform;
 
     private void Awake()
     {
@@ -39,23 +61,69 @@ public class ClickRegister : MonoBehaviour, IPointerClickHandler
 
         _originalScale = _characterImage.transform.localScale;
         _originalColor = _characterImage.color;
+
+        _isMobilePlatform = Application.isMobilePlatform;
+
     }
+
+    private void Start()
+    {
+        Narrator.Instance.OnSoapPreEndingStarted += Narrator_OnSoapPreEndingStarted;
+    }
+
+    private void OnDestroy()
+    {
+        Narrator.Instance.OnSoapPreEndingStarted -= Narrator_OnSoapPreEndingStarted;
+
+        if (_clickSequence != null && _clickSequence.IsActive())
+        {
+            _clickSequence.Kill();
+        }
+
+        CancelInvoke(nameof(ResetCooldown));
+    }
+
+    private void Narrator_OnSoapPreEndingStarted()
+    {
+        _clickDuration = _clickDurationSoapPreEnding;
+        _clickScale = _clickScaleSoapPreEnding;
+        _characterImage = _characterSoapPreEndingImage;
+    }
+
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (_adWarningText.IsTimerRunning)
+            return;
+
+        if (_isMobilePlatform && _enableMobileCooldown && _isOnCooldown)
+            return;
+
+        if (_isMobilePlatform && _enableMobileCooldown)
+            StartCooldown();
+
         OnClick?.Invoke();
         PlayClickAnimation();
     }
 
+    private void StartCooldown()
+    {
+        _isOnCooldown = true;
+        Invoke(nameof(ResetCooldown), _mobileClickCooldown);
+    }
+
+    private void ResetCooldown()
+    {
+        _isOnCooldown = false;
+    }
+
     private void PlayClickAnimation()
     {
-        // Останавливаем предыдущую анимацию частиц
         if (_clickParticles != null && _clickParticles.isPlaying)
         {
             _clickParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         }
 
-        // Убиваем предыдущую анимацию чтобы не было конфликтов
         if (_clickSequence != null && _clickSequence.IsActive())
         {
             _clickSequence.Kill();
@@ -86,20 +154,16 @@ public class ClickRegister : MonoBehaviour, IPointerClickHandler
             snapping: false
         ));
 
-        // Запускаем частицы
         if (_clickParticles != null)
         {
             _clickParticles.Play();
         }
 
-        // Запускаем анимацию
         _clickSequence.Play();
 
-
-        // Проигрываем звук либо предмета, либо дефолтный button
         string clickSoundName = string.Empty;
 
-        if (ShopItemsManager.Instance.CurrentItem)
+        if (ShopItemsManager.Instance?.CurrentItem != null)
         {
             clickSoundName = ShopItemsManager.Instance.CurrentItem.ItemClickAudioClipName;
         }
@@ -108,14 +172,13 @@ public class ClickRegister : MonoBehaviour, IPointerClickHandler
             clickSoundName = "Button";
         }
 
-        AudioManager.Instance.Play(clickSoundName);
+        AudioManager.Instance?.Play(clickSoundName);
     }
 
-    private void OnDestroy()
+
+    public void ForceResetCooldown()
     {
-        if (_clickSequence != null && _clickSequence.IsActive())
-        {
-            _clickSequence.Kill();
-        }
+        CancelInvoke(nameof(ResetCooldown));
+        _isOnCooldown = false;
     }
 }
