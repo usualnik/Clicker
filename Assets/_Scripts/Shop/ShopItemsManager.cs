@@ -6,6 +6,7 @@ public class ShopItemsManager : MonoBehaviour
 {
     public static ShopItemsManager Instance { get; private set; }
     public ShopItem[] AllItemsInShop => _allItemsInShop;
+    public HashSet<int> OpenedItems => _openedItems;
 
     public event Action<ShopItem> OnShopItemBought;
     public event Action<ShopItem> OnNewItemSpawnedInShop;

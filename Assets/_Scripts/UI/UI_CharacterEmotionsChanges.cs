@@ -76,10 +76,10 @@ public class UI_CharacterEmotionsChanges : MonoBehaviour
                 _characterImage.sprite = _emotions[3];
                 break;
             case "Отлично справляешься...":
-                _characterImage.sprite = _emotions[2];
+                _characterImage.sprite = _emotions[1];
                 break;
             case "You are doing great...":
-                _characterImage.sprite = _emotions[2];
+                _characterImage.sprite = _emotions[1];
                 break;
             case "Мм, ловкие у тебя руки...":
                 _characterImage.sprite = _emotions[3];
@@ -106,10 +106,10 @@ public class UI_CharacterEmotionsChanges : MonoBehaviour
                 _characterImage.sprite = _emotions[3];
                 break;
             case "Можно чуть левее?":
-                _characterImage.sprite = _emotions[2];
+                _characterImage.sprite = _emotions[1];
                 break;
             case "Could you go a bit more to the left?":
-                _characterImage.sprite = _emotions[2];
+                _characterImage.sprite = _emotions[1];
                 break;
             case "Мм... Это коммерческий секрет.":
                 _characterImage.sprite = _emotions[3];

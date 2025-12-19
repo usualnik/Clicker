@@ -1,0 +1,19 @@
+{
+    "intExample": 5,
+    "strExample": "Hello!",
+    "boolExample": [
+        false,
+        false,
+        false,
+        false
+    ],
+    "idSave": 327,
+    "YandexServerData": {
+        "Money": 4,
+        "Clicks": 4,
+        "ItemsAvailableInShop": 2,
+        "CurrentItemIndex": 0,
+        "itemsBought": [],
+        "IsFirstTimePlaying": false
+    }
+}

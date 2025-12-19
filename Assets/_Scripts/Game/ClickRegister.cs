@@ -1,13 +1,10 @@
 using DG.Tweening;
 using System;
-using System.Resources;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using YG;
 
-public class ClickRegister : MonoBehaviour, IPointerClickHandler
+public class ClickRegister : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
 {
     public static ClickRegister Instance { get; private set; }
     public event Action OnClick;
@@ -29,23 +26,16 @@ public class ClickRegister : MonoBehaviour, IPointerClickHandler
     [SerializeField] private float _clickScaleSoapPreEnding = 1.1f;
     [SerializeField] private float _clickDurationSoapPreEnding = 0f;
 
-
-
-
-    [Header("Mobile Settings")]
-    [SerializeField] private float _mobileClickCooldown = 0.2f;
-    [SerializeField] private bool _enableMobileCooldown = true;
-
     [Header("System")]
     [SerializeField] private UI_AdWarningText _adWarningText;
-    [SerializeField] private GameplayText _gameplayText;
-
 
     private Vector3 _originalScale;
     private Color _originalColor;
     private DG.Tweening.Sequence _clickSequence;
-    private bool _isOnCooldown = false;
     private bool _isMobilePlatform;
+
+    private bool _isTouching = false;
+    private int _currentTouchId = -1;
 
     private void Awake()
     {
@@ -61,9 +51,7 @@ public class ClickRegister : MonoBehaviour, IPointerClickHandler
 
         _originalScale = _characterImage.transform.localScale;
         _originalColor = _characterImage.color;
-
         _isMobilePlatform = Application.isMobilePlatform;
-
     }
 
     private void Start()
@@ -73,14 +61,15 @@ public class ClickRegister : MonoBehaviour, IPointerClickHandler
 
     private void OnDestroy()
     {
-        Narrator.Instance.OnSoapPreEndingStarted -= Narrator_OnSoapPreEndingStarted;
+        if (Narrator.Instance != null)
+        {
+            Narrator.Instance.OnSoapPreEndingStarted -= Narrator_OnSoapPreEndingStarted;
+        }
 
         if (_clickSequence != null && _clickSequence.IsActive())
         {
             _clickSequence.Kill();
         }
-
-        CancelInvoke(nameof(ResetCooldown));
     }
 
     private void Narrator_OnSoapPreEndingStarted()
@@ -90,45 +79,55 @@ public class ClickRegister : MonoBehaviour, IPointerClickHandler
         _characterImage = _characterSoapPreEndingImage;
     }
 
-
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (_adWarningText.IsTimerRunning)
-            return;
+        if (!_isMobilePlatform)
+        {
+            HandleClick();
+        }
+    }
 
-        if (_isMobilePlatform && _enableMobileCooldown && _isOnCooldown)
-            return;
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (!_isMobilePlatform) return;
 
-        if (_isMobilePlatform && _enableMobileCooldown)
-            StartCooldown();
+        if (!_isTouching)
+        {
+            _isTouching = true;
+            _currentTouchId = eventData.pointerId;
+            HandleClick();
+        }
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        if (!_isMobilePlatform) return;
+
+        if (eventData.pointerId == _currentTouchId)
+        {
+            _isTouching = false;
+            _currentTouchId = -1;
+        }
+    }
+
+    private void HandleClick()
+    {
+        if (_adWarningText != null && _adWarningText.IsTimerRunning)
+            return;
 
         OnClick?.Invoke();
         PlayClickAnimation();
     }
 
-    private void StartCooldown()
-    {
-        _isOnCooldown = true;
-        Invoke(nameof(ResetCooldown), _mobileClickCooldown);
-    }
-
-    private void ResetCooldown()
-    {
-        _isOnCooldown = false;
-    }
-
     private void PlayClickAnimation()
     {
-        if (_clickParticles != null && _clickParticles.isPlaying)
-        {
-            _clickParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-        }
-
+        // Останавливаем предыдущую анимацию, если она есть
         if (_clickSequence != null && _clickSequence.IsActive())
         {
             _clickSequence.Kill();
         }
 
+        // Создаем новую анимацию
         _clickSequence = DOTween.Sequence();
 
         // 1. Быстрое уменьшение
@@ -156,29 +155,24 @@ public class ClickRegister : MonoBehaviour, IPointerClickHandler
 
         if (_clickParticles != null)
         {
+            _clickParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             _clickParticles.Play();
         }
 
         _clickSequence.Play();
 
-        string clickSoundName = string.Empty;
-
+        string clickSoundName = "Button";
         if (ShopItemsManager.Instance?.CurrentItem != null)
         {
             clickSoundName = ShopItemsManager.Instance.CurrentItem.ItemClickAudioClipName;
-        }
-        else
-        {
-            clickSoundName = "Button";
         }
 
         AudioManager.Instance?.Play(clickSoundName);
     }
 
-
-    public void ForceResetCooldown()
+    public void ResetTouchState()
     {
-        CancelInvoke(nameof(ResetCooldown));
-        _isOnCooldown = false;
+        _isTouching = false;
+        _currentTouchId = -1;
     }
 }
