@@ -7,7 +7,7 @@ public class UI_AdWarningText : MonoBehaviour
     public bool IsTimerRunning => _isTimerRunnnig;
 
     private TextMeshProUGUI _adWarningtext;
-    private const float AD_WARNING_TIMER_MAX = 3f;
+    private const float AD_WARNING_TIMER_MAX = 2f;
     private float _adWarningTimer;
 
     private bool _isTimerRunnnig = false;

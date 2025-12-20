@@ -7,13 +7,15 @@
         false,
         false
     ],
-    "idSave": 327,
+    "idSave": 966,
     "YandexServerData": {
-        "Money": 4,
-        "Clicks": 4,
-        "ItemsAvailableInShop": 2,
-        "CurrentItemIndex": 0,
-        "itemsBought": [],
+        "Money": 438,
+        "Clicks": 217,
+        "ItemsAvailableInShop": 3,
+        "CurrentItemIndex": 1,
+        "itemsBought": [
+            1
+        ],
         "IsFirstTimePlaying": false
     }
 }

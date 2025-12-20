@@ -6,7 +6,7 @@ public class YandexInterstitial : MonoBehaviour
     [SerializeField] private GameObject _adWarning;
 
     private const float AD_COOLDOWN_MAX = 65f;
-    private const float AD_WARNING_TIME = 3f;
+    private const float AD_WARNING_TIME = 2f;
 
     private float adTimer;
 
