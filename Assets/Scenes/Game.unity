@@ -1855,7 +1855,7 @@ PrefabInstance:
     - target: {fileID: 7458594166701686478, guid: 11c3e3e8a58f3c44bafcabdbadb36215, type: 3}
       propertyPath: '_endingBackgrounds.Array.data[0]'
       value: 
-      objectReference: {fileID: 21300000, guid: 42418d2f732d58f47ae2df5405fee7c8, type: 3}
+      objectReference: {fileID: 21300000, guid: cf7a9da36aa43b043bc978b03a299eb5, type: 3}
     - target: {fileID: 7955443871601554209, guid: 11c3e3e8a58f3c44bafcabdbadb36215, type: 3}
       propertyPath: m_Sprite
       value: 
