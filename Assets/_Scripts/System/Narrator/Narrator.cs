@@ -87,6 +87,13 @@ public class Narrator : MonoBehaviour
     private void InitEnding()
     {
         _ending.SetActive(true);
+
+        if (!PlayerData.Instance.GetAlreadyEndedWithItemIndex().Contains(ShopItemsManager.Instance.CurrentItem.ItemIndex))
+        {
+            PlayerData.Instance.SetEndingsOpened(PlayerData.Instance.GetEndingsOpened() + 1);
+
+            PlayerData.Instance.AddItemIndexToAlreadeEndedWithItemIndex(ShopItemsManager.Instance.CurrentItem.ItemIndex);
+        }
     }
     private void ReConfigureNarrativeData(ShopItem shopItem)
     {

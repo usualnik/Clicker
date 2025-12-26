@@ -11,7 +11,9 @@ public class Data
     public int CurrentItemIndex = 0;
     public List<int> itemsBought = new List<int>();
     public bool IsFirstTimePlaying = true;
-}
+    public int EndingsOpened = 0;
+    public HashSet<int> AlreadyEndedWithItemIndex = new HashSet<int>();
+ }
 
 public class PlayerData : MonoBehaviour
 {
@@ -71,7 +73,7 @@ public class PlayerData : MonoBehaviour
         data.ItemsAvailableInShop = 2;
         data.CurrentItemIndex = 0;
         data.itemsBought.Clear();
-        data.IsFirstTimePlaying = true;
+        data.IsFirstTimePlaying = true;        
     }
 
     #region Get
@@ -81,6 +83,8 @@ public class PlayerData : MonoBehaviour
     public bool GetIsFirstTimePlaying() => data.IsFirstTimePlaying;
     public List<int> GetItemsBought() => data.itemsBought;
     public int GetCurrentItemIndex() => data.CurrentItemIndex;
+    public int GetEndingsOpened() => data.EndingsOpened;
+    public HashSet<int> GetAlreadyEndedWithItemIndex() => data.AlreadyEndedWithItemIndex;
 
 
     #endregion
@@ -101,6 +105,24 @@ public class PlayerData : MonoBehaviour
             SavePlayerDataToYandex();
         }
 
+    }
+
+    public void SetEndingsOpened(int value)
+    {
+       data.EndingsOpened = value;
+
+        if (data.EndingsOpened > 6)
+        {
+            data.EndingsOpened = 6;
+        }
+
+        SavePlayerDataToYandex();
+    }
+
+    public void AddItemIndexToAlreadeEndedWithItemIndex(int itemIndex)
+    {
+        data.AlreadyEndedWithItemIndex.Add(itemIndex);
+        SavePlayerDataToYandex();
     }
     public void SetCurrentClicks(int value)
     {
